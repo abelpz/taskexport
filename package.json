@@ -1,0 +1,15 @@
+{
+  "name": "taskexport",
+  "version": "1.0.0",
+  "description": "Create tasks for translating and checking unfoldingWord resources and export them to clickUp.",
+  "main": "index.js",
+  "author": "abelpz",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "axios": "^0.24.0"
+  },
+  "scripts": {
+    "start" : "node index.js"
+  }
+}
