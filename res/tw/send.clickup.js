@@ -1,8 +1,5 @@
 import axios from 'axios'
 
-const teamId = ''
-const spaceId = ''
-const folderId = ''
 const listId = ''
 const selectedList = listId
 const token = ''
@@ -42,15 +39,15 @@ const sendToClickUp = async ({path,body,callBack}) => {
     }
 }
 
-const createCheckLists = async (checkLists, taskId) => {
+const sendCheckLists = async (checkLists, taskId) => {
     if (checkLists.length > 0) {
         for (const checkList of checkLists) {
-            await createCheckList(checkList, taskId)
+            await sendCheckList(checkList, taskId)
         }
     }
 }
 
-const createCheckList = async (data, taskId) => {
+const sendCheckList = async (data, taskId) => {
     console.log("------ sending checklist")
     await sendToClickUp({
         path: `task/${taskId}/checklist/`,
@@ -62,14 +59,14 @@ const createCheckList = async (data, taskId) => {
             const checkList = response.data.checklist
             //console.log("checklistId: ", checkList.id);
             if(data.items.length > 0)
-                await createCheckListItems(data.items, checkList.id)
+                await sendCheckListItems(data.items, checkList.id)
         }
     })
 }
 
-const createCheckListItems = async (items, checkListId) => {
+const sendCheckListItems = async (items, checkListId) => {
     for (const item of items) {
-        await createCheckListItem(item, checkListId )
+        await sendCheckListItem(item, checkListId )
     }
 }
 
@@ -86,7 +83,7 @@ const getItemIdFromName = (name, items) => {
     }
 }
 
-const createCheckListItem = async (data, checkListId, checkListItemId = null) => {
+const sendCheckListItem = async (data, checkListId, checkListItemId = null) => {
     console.log("-------- sending checklists item")
     await sendToClickUp({
         path: `checklist/${checkListId}/checklist_item`,
@@ -101,7 +98,7 @@ const createCheckListItem = async (data, checkListId, checkListItemId = null) =>
                 for (const child of data.children) {
                     const checkListItemId = getItemIdFromName(data.name, checkList.items)
                     if (checkListItemId) {
-                        await createCheckListItem(child, checkListId, checkListItemId)
+                        await sendCheckListItem(child, checkListId, checkListItemId)
                     }
                 }
             }
@@ -126,7 +123,7 @@ const sendSubTask = async (subTask, parentId) => {
         callBack: async response => {
             //console.log(response.data);
             const newSubTask = response.data;
-            await createCheckLists(subTask.checkLists, newSubTask.id)
+            await sendCheckLists(subTask.checkLists, newSubTask.id)
         }
     })
 }
@@ -156,25 +153,6 @@ const sendTaskTree = async task => {
             }
         }
     })
-}
-
-export const sendTasksTree = async ( tasks, id = 1, loop = true) => {
-    console.info("Sending tasks tree...")
-    var BreakException = {};
-    try {
-        let cont = 0;
-        if (loop) {
-            const newTasks = tasks.slice(id-1)
-            for (const task of newTasks) {
-                await sendTaskTree(task)
-            }
-        } else {
-            if(tasks[id-1])
-                await sendTaskTree(tasks[id-1])
-        }
-    } catch (e) {
-        if (e !== BreakException) throw e;
-    }
 }
 
 const sendInterval = (tasksTree, start, interval) => {
@@ -211,3 +189,22 @@ const testRequests = async (numReq) => {
     
 }
 //testRequests(500)
+
+export const sendTasksTree = async ( tasks, id = 1, loop = true) => {
+    console.info("Sending tasks tree...")
+    var BreakException = {};
+    try {
+        let cont = 0;
+        if (loop) {
+            const newTasks = tasks.slice(id-1)
+            for (const task of newTasks) {
+                await sendTaskTree(task)
+            }
+        } else {
+            if(tasks[id-1])
+                await sendTaskTree(tasks[id-1])
+        }
+    } catch (e) {
+        if (e !== BreakException) throw e;
+    }
+}
