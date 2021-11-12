@@ -1,12 +1,63 @@
 import axios from 'axios'
+import Conf from 'conf'
 
-const listId = ''
-const selectedList = listId
-const token = ''
+const conf = new Conf()
 
+const listId = conf.get('clickUpList')
+const token = conf.get('clickUpAuth')
 let requestsCount = 0
 const maxRequestCount = 100
 const RequestTimeOut = 6000
+
+export const sendTasksTree = async (tasks, id = 1, loop = true) => {
+    if (!listId) {
+        throw 'ClickUp list id not found.'
+        return
+    }
+    console.info("Sending tasks tree...")
+    var BreakException = {};
+    try {
+        let cont = 0;
+        if (loop) {
+            const newTasks = tasks.slice(id-1)
+            for (const task of newTasks) {
+                await sendTaskTree(task)
+            }
+        } else {
+            if(tasks[id-1])
+                await sendTaskTree(tasks[id-1])
+        }
+    } catch (e) {
+        if (e !== BreakException) throw e;
+    }
+}
+
+export const sendTaskTree = async task => {
+    console.info(`-- Sending task ${task.id}`)
+    await sendToClickUp({
+        path: `list/${listId}/task`,
+        body : {
+            name: task.name,
+            description: task.description,
+            tags: task.tags,
+            status: "POR HACER",
+            notify_all: true,
+            parent: null,
+            links_to: null,
+            priority: 4,
+        },
+        callBack: async response => {
+            //console.log(response.data);
+            if (task.subtasks.length > 0) {
+                const parentData = response.data
+                const parentId = parentData.id;
+                for (const subtask of task.subtasks) {
+                    await sendSubTask(subtask, parentId)
+                }
+            }
+        }
+    })
+}
 
 const sendToClickUp = async ({path,body,callBack}) => {
     const _baseApi = 'https://api.clickup.com/api/v2/'
@@ -70,19 +121,6 @@ const sendCheckListItems = async (items, checkListId) => {
     }
 }
 
-const getItemIdFromName = (name, items) => {
-    if (items.length > 0) {
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].name === name){
-                return items[i].id
-            } else if (items[i].children.length > 0){
-                const id = getItemIdFromName(name, items[i].children)
-                if(id) return id
-            }
-        }
-    }
-}
-
 const sendCheckListItem = async (data, checkListId, checkListItemId = null) => {
     console.log("-------- sending checklists item")
     await sendToClickUp({
@@ -106,10 +144,23 @@ const sendCheckListItem = async (data, checkListId, checkListItemId = null) => {
     })
 }
 
+const getItemIdFromName = (name, items) => {
+    if (items.length > 0) {
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].name === name){
+                return items[i].id
+            } else if (items[i].children.length > 0){
+                const id = getItemIdFromName(name, items[i].children)
+                if(id) return id
+            }
+        }
+    }
+}
+
 const sendSubTask = async (subTask, parentId) => {
     console.info("---- sending subtask: ", subTask.id)
     await sendToClickUp({
-        path: `list/${selectedList}/task`,
+        path: `list/${listId}/task`,
         body : {
             name: subTask.name,
             description: subTask.description,
@@ -124,33 +175,6 @@ const sendSubTask = async (subTask, parentId) => {
             //console.log(response.data);
             const newSubTask = response.data;
             await sendCheckLists(subTask.checkLists, newSubTask.id)
-        }
-    })
-}
-
-const sendTaskTree = async task => {
-    console.info(`-- Sending task ${task.id}`)
-    await sendToClickUp({
-        path: `list/${selectedList}/task`,
-        body : {
-            name: task.name,
-            description: task.description,
-            tags: task.tags,
-            status: "POR HACER",
-            notify_all: true,
-            parent: null,
-            links_to: null,
-            priority: 4,
-        },
-        callBack: async response => {
-            //console.log(response.data);
-            if (task.subtasks.length > 0) {
-                const parentData = response.data
-                const parentId = parentData.id;
-                for (const subtask of task.subtasks) {
-                    await sendSubTask(subtask, parentId)
-                }
-            }
         }
     })
 }
@@ -190,21 +214,4 @@ const testRequests = async (numReq) => {
 }
 //testRequests(500)
 
-export const sendTasksTree = async ( tasks, id = 1, loop = true) => {
-    console.info("Sending tasks tree...")
-    var BreakException = {};
-    try {
-        let cont = 0;
-        if (loop) {
-            const newTasks = tasks.slice(id-1)
-            for (const task of newTasks) {
-                await sendTaskTree(task)
-            }
-        } else {
-            if(tasks[id-1])
-                await sendTaskTree(tasks[id-1])
-        }
-    } catch (e) {
-        if (e !== BreakException) throw e;
-    }
-}
+

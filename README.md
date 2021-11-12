@@ -1,11 +1,11 @@
-# tasksExport PoC
+# GL Tasks PoC
 
 Create tasks for translating and checking unfoldingWord resources and export them to clickUp.
 
 Install dependencies by running ```yarn``` in your terminal.
 
-To test this script run ```yarn start``` in your terminal.
+To setup required parameters run ```yarn setup``` in your terminal.
 
-You wil need the id of the clickUp list where you want the tasks to be added, and the token from your clickup app. See: <https://clickup20.docs.apiary.io/#introduction/authentication>
+after parameters are setup you can repeat last action by running ```yarn start```.
 
-Add both params to the ```token``` and ```listId``` constants in [checking.sendTW.js](res/checking.sendTw.js)
+You wil need the token of your clickup app. See: <https://clickup20.docs.apiary.io/#introduction/authentication>

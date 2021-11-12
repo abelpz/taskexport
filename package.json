@@ -1,15 +1,19 @@
 {
-  "name": "taskexport",
+  "name": "gl-task",
   "version": "1.0.0",
   "description": "Create tasks for translating and checking unfoldingWord resources and export them to clickUp.",
-  "main": "index.js",
+  "main": "./src/index.js",
   "author": "abelpz",
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "axios": "^0.24.0"
+    "axios": "^0.24.0",
+    "colors": "^1.4.0",
+    "conf": "^10.0.3",
+    "inquirer": "^8.2.0"
   },
   "scripts": {
-    "start" : "node index.js"
+    "start": "node ./src/index.js",
+    "setup": "node ./src/cli.js"
   }
 }

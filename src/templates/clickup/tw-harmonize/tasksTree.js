@@ -1,68 +1,17 @@
-const checkListTypes = [
-    [
-        {
-            name: "CHECKLIST USING GLT",
-            items: [
-                {
-                    name: "Is the definition for this tW (in the article) correct for the TPL context?",
-                    children: [
-                        {
-                            name: "If not, consider whether it is necessary to write a new article to cover this particular meaning of the word.",
-                            children: []
-                        },
-                        {
-                            name: "If not, decide whether it is the tW article or the TPL text that needs to be edited.",
-                            children: []
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            name: "CHECKLIST USING GST",
-            items: [
-                {
-                    name: 'Is the TPS representation of this tW included as a "translation suggestion" in the article?',
-                    children: [
-                        {
-                            name: "If not, include it",
-                            children: []
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-    [
-        {
-            name: "CHECKLIST",
-            items: [
-                {
-                    name: "Does each difficult word in the TPL have a tW article explaining it?",
-                    children: [
-                        {
-                            name: "If not, search for the item in the tW and add the link, or create the missing tW item in tC Create.",
-                            children: []
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-]
-
 export const createTasksTree = twl => {
     
-    //create object with tasks tree
+    //create array to contain task trees
+    let tasks = []
+   
     let chapter
     let verse
-    let tasks = []
+
     let subCount = 0
     let words = []
     
+    //generate task trees from resource and add them to tasks array
     for (let index = 1; index < twl.length; index++) {
-        //Si flag es true, indica que esta palabra es repetida
-        let flag = true
+        let flag = true //true if the word is repeated
         const word = twl[index][5].match(/(?<=\/bible\/.*\/).*/)[0]
         if (!words.includes(word)) {
             words = [...words, word]
@@ -115,5 +64,59 @@ export const createTasksTree = twl => {
             }]
         }
     }
+
     return tasks
 }
+
+const checkListTypes = [
+    [
+        {
+            name: "CHECKLIST USING GLT",
+            items: [
+                {
+                    name: "Is the definition for this tW (in the article) correct for the TPL context?",
+                    children: [
+                        {
+                            name: "If not, consider whether it is necessary to write a new article to cover this particular meaning of the word.",
+                            children: []
+                        },
+                        {
+                            name: "If not, decide whether it is the tW article or the TPL text that needs to be edited.",
+                            children: []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            name: "CHECKLIST USING GST",
+            items: [
+                {
+                    name: 'Is the TPS representation of this tW included as a "translation suggestion" in the article?',
+                    children: [
+                        {
+                            name: "If not, include it",
+                            children: []
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    [
+        {
+            name: "CHECKLIST",
+            items: [
+                {
+                    name: "Does each difficult word in the TPL have a tW article explaining it?",
+                    children: [
+                        {
+                            name: "If not, search for the item in the tW and add the link, or create the missing tW item in tC Create.",
+                            children: []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+]
