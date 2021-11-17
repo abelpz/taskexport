@@ -1,6 +1,6 @@
 export const resources = {
-    "ta": "",
-    "tw": "",
-    "tq": "",
-    "tn": ""
+    "ta": "Translation Academy",
+    "twl": "Translation Words",
+    "tq": "Translation Questions",
+    "tn": "Translation Notes"
 }
