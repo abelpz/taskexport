@@ -1,4 +1,4 @@
-export const createTasksTree = (resource,data = {}) => {
+export const createTasksTree = ({resource,data = {}, filter = []}) => {
 
     //create array to contain task trees
     let tasks = []
